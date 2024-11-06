@@ -17,7 +17,7 @@ class ExpensesAPI:
         self.url = self.base_url + self.endpoint
 
     # Wrapping the function that the user calls in a decorator saves a lot of code as it can handle all the exceptions for all 4 functions
-    def __exception_printer(func):
+    def _exception_printer(func):
         def wrapper(self, *args, **kwargs):
             try:       
                 return func(self, *args, **kwargs)
@@ -34,25 +34,25 @@ class ExpensesAPI:
                 print(f"No...\n{e}")
         return wrapper
 
-    @__exception_printer
+    @_exception_printer
     def load_expenses(self):
         response = requests.get(self.url)
         response.raise_for_status()
         return response.json()
     
-    @__exception_printer
+    @_exception_printer
     def add_expense(self, expense):
         response = requests.post(self.url, json=expense)
         response.raise_for_status()
         return response
     
-    @__exception_printer
+    @_exception_printer
     def edit_expense(self, expense_id, expense):
         response = requests.put(f"{self.url}/{expense_id}", json=expense)
         response.raise_for_status()
         return response
     
-    @__exception_printer
+    @_exception_printer
     def del_expense(self, expense_id):
         response = requests.delete(f"{self.url}/{expense_id}")
         response.raise_for_status()
