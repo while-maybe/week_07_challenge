@@ -10,86 +10,53 @@ class Expenses:
         # [Expense] acts as placehold for a list containing future Expenses
         self.expenses = exp_list if exp_list else []
 
-
 class ExpensesAPI:
     def __init__(self):
         self.base_url = 'http://127.0.0.1:5000'
         self.endpoint = '/expenses'
         self.url = self.base_url + self.endpoint
 
+    # Wrapping the function that the user calls in a decorator saves a lot of code as it can handle all the exceptions for all 4 functions
+    def __exception_printer(func):
+        def wrapper(self, *args, **kwargs):
+            try:       
+                return func(self, *args, **kwargs)
+            except ConnectionError:
+                print("[ERROR] Can't connect to API")
+            except ConnectionRefusedError:
+                print("[ERROR] Connection refused")
+            except requests.exceptions.HTTPError as err:
+                if err.response.status_code == 404:
+                    print(f"[ERROR] API says not found (404)")
+                else:    
+                    print(f"[ERROR] HTTP Error: {err}")
+            except Exception as e:
+                print(f"No...\n{e}")
+        return wrapper
+
+    @__exception_printer
     def load_expenses(self):
-        try:
-            response = requests.get(self.url)
-            response.raise_for_status()
-            
-            return response.json()
-
-        except ConnectionError:
-            print("[ERROR] Can't connect to API")
-        except ConnectionRefusedError:
-            print("[ERROR] Connection refused")
-        except requests.exceptions.HTTPError as err:
-            if err.response.status_code == 404:
-                print(f"[ERROR] API says not found (404)")
-            else:    
-                print(f"[ERROR] HTTP Error: {err}")
-        except Exception as e:
-            print(f"No...\n{e}")
-            
+        response = requests.get(self.url)
+        response.raise_for_status()
+        return response.json()
+    
+    @__exception_printer
     def add_expense(self, expense):
-        try:
-            response = requests.post(self.url, json=expense)
-            response.raise_for_status()
-            return response
-        
-        except ConnectionError:
-            print("[ERROR] Can't connect to API")
-        except ConnectionRefusedError:
-            print("[ERROR] Connection refused")
-        except requests.exceptions.HTTPError as err:
-            if err.response.status_code == 404:
-                print(f"[ERROR] API says not found (404)")
-            else:    
-                print(f"[ERROR] HTTP Error: {err}")
-        except Exception as e:
-            print(f"No...\n{e}")
+        response = requests.post(self.url, json=expense)
+        response.raise_for_status()
+        return response
     
+    @__exception_printer
     def edit_expense(self, expense_id, expense):
-        try:
-            response = requests.put(f"{self.url}/{expense_id}", json=expense)
-            response.raise_for_status()
-            return response
-
-        except ConnectionError:
-            print("[ERROR] Can't connect to API")
-        except ConnectionRefusedError:
-            print("[ERROR] Connection refused")
-        except requests.exceptions.HTTPError as err:
-            if err.response.status_code == 404:
-                print(f"[ERROR] API says not found (404)")
-            else:    
-                print(f"[ERROR] HTTP Error: {err}")
-        except Exception as e:
-            print(f"No...\n{e}")
+        response = requests.put(f"{self.url}/{expense_id}", json=expense)
+        response.raise_for_status()
+        return response
     
+    @__exception_printer
     def del_expense(self, expense_id):
-        try:
-            response = requests.delete(f"{self.url}/{expense_id}")
-            response.raise_for_status()
-            return response
-
-        except ConnectionError:
-            print("[ERROR] Can't connect to API")
-        except ConnectionRefusedError:
-            print("[ERROR] Connection refused")
-        except requests.exceptions.HTTPError as err:
-            if err.response.status_code == 404:
-                print(f"[ERROR] API says not found (404)")
-            else:    
-                print(f"[ERROR] HTTP Error: {err}")
-        except Exception as e:
-            print(f"No...\n{e}")
-
+        response = requests.delete(f"{self.url}/{expense_id}")
+        response.raise_for_status()
+        return response
 
 def create_expense():
     exp_desc = ""
