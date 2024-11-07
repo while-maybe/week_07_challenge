@@ -91,7 +91,7 @@ def clear_screen():
 def exit_program():
     clear_screen()
     show_main_screen()
-    print("Thanks for using tasker 1.1, exiting...")
+    print("Thanks for using Expenser 1.0, exiting...")
 
 def view_tasks():
     clear_screen()
